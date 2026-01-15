@@ -1,5 +1,5 @@
 variables:
-  max_tokens: 64000
+  max_tokens: 8192
 
 type: agent
 name: nexau_code_agent
