@@ -1,0 +1,510 @@
+/* 2.5D等距视角数据流程可视化 - 科技感深蓝色主题 */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Exo 2', 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2a 50%, #0a0a1a 100%);
+    color: #ffffff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* 网格背景 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(26, 58, 122, 0.2) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26, 58, 122, 0.2) 1px, transparent 1px);
+    background-size: 80px 80px;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* 发光效果 */
+body::after {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, rgba(74, 144, 226, 0.15) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 头部样式 */
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 25px;
+    background: rgba(10, 20, 40, 0.7);
+    border-radius: 20px;
+    border: 1px solid rgba(74, 144, 226, 0.4);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(74, 144, 226, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.2), transparent);
+    animation: headerGlow 3s infinite linear;
+}
+
+@keyframes headerGlow {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.8rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #4a90e2, #1a5fb4, #0a3a7a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+    text-shadow: 0 0 30px rgba(74, 144, 226, 0.5);
+    letter-spacing: 1px;
+}
+
+.title i {
+    margin-right: 15px;
+    font-size: 2.5rem;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #8ab4f8;
+    margin-bottom: 20px;
+    font-weight: 300;
+}
+
+/* 主内容区域 */
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+/* 可视化容器 */
+.visualization-container {
+    position: relative;
+    background: rgba(10, 15, 30, 0.8);
+    border-radius: 20px;
+    border: 1px solid rgba(74, 144, 226, 0.4);
+    overflow: hidden;
+    min-height: 700px;
+    box-shadow: 0 15px 40px rgba(74, 144, 226, 0.2);
+}
+
+#scene-container {
+    width: 100%;
+    height: 100%;
+    min-height: 700px;
+    position: relative;
+}
+
+/* 数据标签样式 */
+.data-label {
+    position: absolute;
+    z-index: 100;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 14px;
+    text-align: center;
+    background: rgba(10, 20, 40, 0.8);
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid rgba(74, 144, 226, 0.5);
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+}
+
+.data-label:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(74, 144, 226, 0.5);
+}
+
+/* 步骤指示器 */
+.steps-container {
+    background: rgba(10, 20, 40, 0.8);
+    border-radius: 15px;
+    padding: 25px;
+    border: 1px solid rgba(74, 144, 226, 0.4);
+    backdrop-filter: blur(10px);
+    margin-top: 30px;
+}
+
+.steps-container h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.4rem;
+    color: #4a90e2;
+    margin-bottom: 20px;
+    text-align: center;
+    text-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+}
+
+.steps {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.step {
+    padding: 15px 20px;
+    background: rgba(26, 58, 122, 0.5);
+    border-radius: 10px;
+    border: 1px solid rgba(74, 144, 226, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.step:hover {
+    background: rgba(74, 144, 226, 0.3);
+    border-color: #4a90e2;
+    transform: translateX(5px);
+}
+
+.step.active {
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.4), rgba(26, 58, 122, 0.7));
+    border-color: #4a90e2;
+    box-shadow: 0 0 20px rgba(74, 144, 226, 0.3);
+}
+
+.step::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.step:hover::before {
+    left: 100%;
+}
+
+.step-number {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background: rgba(74, 144, 226, 0.3);
+    border-radius: 50%;
+    text-align: center;
+    line-height: 30px;
+    margin-right: 15px;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    color: #4a90e2;
+}
+
+.step-title {
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+.step-description {
+    font-size: 0.9rem;
+    color: #8ab4f8;
+    margin-left: 45px;
+}
+
+/* 页脚样式 */
+.footer {
+    background: rgba(10, 15, 30, 0.8);
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid rgba(74, 144, 226, 0.4);
+    backdrop-filter: blur(10px);
+    margin-top: 40px;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid rgba(74, 144, 226, 0.2);
+    color: #8ab4f8;
+    font-size: 0.9rem;
+}
+
+.tech-stack {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 15px;
+    font-size: 1.2rem;
+}
+
+.tech-stack i {
+    color: #4a90e2;
+    transition: all 0.3s ease;
+}
+
+.tech-stack i:hover {
+    transform: scale(1.2);
+    text-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .title {
+        font-size: 2rem;
+    }
+    
+    .visualization-container {
+        min-height: 500px;
+    }
+    
+    #scene-container {
+        min-height: 500px;
+    }
+    
+    .tech-stack {
+        flex-wrap: wrap;
+    }
+}
+
+/* 加载动画 */
+.loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #0a0a1a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+}
+
+.loading.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(74, 144, 226, 0.3);
+    border-top: 4px solid #4a90e2;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    color: #4a90e2;
+    text-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+}
+
+/* 数据流线动画 */
+@keyframes flowPulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+
+/* 等距视角提示 */
+.isometric-hint {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(10, 20, 40, 0.8);
+    color: #8ab4f8;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 12px;
+    border: 1px solid rgba(74, 144, 226, 0.3);
+    max-width: 200px;
+    pointer-events: none;
+    z-index: 100;
+    backdrop-filter: blur(5px);
+}
+
+.isometric-hint i {
+    color: #4a90e2;
+    margin-right: 8px;
+}
+
+/* 2.5D等距视角特定样式 */
+.isometric-view {
+    perspective: 1000px;
+    transform-style: preserve-3d;
+}
+
+/* 科技感边框效果 */
+.tech-border {
+    position: relative;
+    border: 1px solid rgba(74, 144, 226, 0.4);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.tech-border::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #4a90e2, transparent);
+    animation: borderFlow 3s infinite linear;
+}
+
+@keyframes borderFlow {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* 数据节点样式 */
+.data-node {
+    position: relative;
+    background: rgba(26, 58, 122, 0.6);
+    border: 1px solid rgba(74, 144, 226, 0.5);
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px;
+    transition: all 0.3s ease;
+}
+
+.data-node:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(74, 144, 226, 0.3);
+    border-color: #4a90e2;
+}
+
+.data-node::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(74, 144, 226, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.data-node:hover::after {
+    opacity: 1;
+}
+
+/* 数据流线样式 */
+.data-flow-line {
+    position: absolute;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ffcc00, transparent);
+    animation: flowPulse 2s infinite;
+}
+
+/* 等距视角网格 */
+.isometric-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(74, 144, 226, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74, 144, 226, 0.1) 1px, transparent 1px);
+    background-size: 40px 40px;
+    transform: rotateX(60deg) rotateZ(45deg);
+    transform-style: preserve-3d;
+    opacity: 0.3;
+}
+
+/* 响应式调整 */
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .title {
+        font-size: 1.8rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+    }
+    
+    .visualization-container {
+        min-height: 400px;
+    }
+    
+    #scene-container {
+        min-height: 400px;
+    }
+    
+    .steps-container {
+        padding: 15px;
+    }
+    
+    .step {
+        padding: 12px 15px;
+    }
+    
+    .step-number {
+        width: 25px;
+        height: 25px;
+        line-height: 25px;
+        font-size: 0.9rem;
+    }
+    
+    .step-title {
+        font-size: 0.9rem;
+    }
+    
+    .step-description {
+        font-size: 0.8rem;
+        margin-left: 40px;
+    }
+}

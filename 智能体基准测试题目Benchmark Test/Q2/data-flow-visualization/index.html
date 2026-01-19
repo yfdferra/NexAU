@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科技感数据流程可视化 - 2.5D等距视角</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">
+                <i class="fas fa-satellite-dish"></i>
+                数据全链路可视化平台
+            </h1>
+            <p class="subtitle">从数据上链到数据归档的完整生命周期管理</p>
+        </header>
+
+        <main class="main-content">
+            <div class="visualization-container">
+                <div id="scene-container"></div>
+
+            </div>
+
+            <div class="steps-container">
+                <h3><i class="fas fa-project-diagram"></i> 数据流程步骤</h3>
+                <div class="steps">
+                    <div class="step active">
+                        <span class="step-number">1</span>
+                        <div class="step-content">
+                            <div class="step-title">数据上链</div>
+                            <div class="step-description">原始数据接入与区块链存储</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <div class="step-title">数据归集</div>
+                            <div class="step-description">多源数据汇聚与整合</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            <div class="step-title">数据治理</div>
+                            <div class="step-description">数据清洗、标准化与质量管理</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">4</span>
+                        <div class="step-content">
+                            <div class="step-title">数据应用</div>
+                            <div class="step-description">数据分析、可视化与业务应用</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">5</span>
+                        <div class="step-content">
+                            <div class="step-title">数据归档</div>
+                            <div class="step-description">历史数据存储与生命周期管理</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-bottom">
+                <p>© 2024 数据全链路可视化平台 | 基于 Three.js 构建的 2.5D 等距视角可视化系统</p>
+                <p class="tech-stack">
+                    <i class="fab fa-js-square"></i> Three.js 
+                    <i class="fab fa-css3-alt"></i> CSS3 
+                    <i class="fab fa-html5"></i> HTML5
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
